@@ -9,18 +9,23 @@ import java.util.Scanner;
 public class SimpleEchoClient {
     public static void main(String args[]) {
         System.out.println("Simple Echo Client");
-
+        Scanner scanner = new Scanner(System.in);
+        
         try {
             System.out.println("Waiting for connection.....");
             InetAddress localAddress = InetAddress.getLocalHost();
 
+            // System.out.println("Enter port number");
+            // int port_num = Integer.parseInt(scanner.nextLine());
+
             try (
-                Socket clientSocket = new Socket(localAddress, 6000);
+                Socket clientSocket = new Socket(localAddress, 2121);
+                Socket dataSocket = new Socket(localAddress, 2020);
                 PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
                 BufferedReader br = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))
             ) {
                 System.out.println("Connected to server");
-                Scanner scanner = new Scanner(System.in);
+                // Scanner scanner = new Scanner(System.in);
 
                 while (true) {
                     System.out.print("Enter text: ");

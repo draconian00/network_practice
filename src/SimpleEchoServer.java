@@ -19,7 +19,8 @@ public class SimpleEchoServer {
                 PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
             ) {
                 String inputLine;
-                while ((inputLine = br.readLine()) != null) {
+                while (true) { //((inputLine = br.readLine()) != null) {
+                    inputLine = br.readLine();
                     System.out.println("Client request: " + inputLine);
                     out.println(inputLine);
                 }
