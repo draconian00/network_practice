@@ -4,42 +4,64 @@ import java.net.Socket;
 
 public class ThreadedServer {
     public static void main(String[] args) throws IOException {
-        final ServerSocket commandSocket = new ServerSocket(2121);
-        final ServerSocket dataSocket = new ServerSocket(2020);
+        final ServerSocket c_socket = new ServerSocket(2121);
+        final ServerSocket d_socket = new ServerSocket(2020);
+
+        System.out.println("Server waiting connection on Port 2121, 2020");
 
         try {
             for (;;) {
-                final Socket clientCommand = commandSocket.accept();
+                final Socket c_client = c_socket.accept();
 
-                System.out.println("Accepted connection from " + commandSocket);
+                System.out.println("Accepted connection from " + c_socket);
 
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
                         try (
                             BufferedReader br = new BufferedReader(
-                                new InputStreamReader(clientCommand.getInputStream())
+                                new InputStreamReader(c_client.getInputStream())
                             );
-                            PrintWriter out = new PrintWriter(clientCommand.getOutputStream(), true)
+                            PrintWriter out = new PrintWriter(c_client.getOutputStream(), true)
                         ) {
-                            final Socket clientData = dataSocket.accept();
-                            System.out.println("Accepted data connection from " + dataSocket);
+                            final Socket d_client = d_socket.accept();
 
                             String commandInput;
+                            String[] commandArray;
                             while ((commandInput = br.readLine()) != null) {
-                                System.out.println("Client command : "  + commandInput);
-                                out.println(commandInput);
-                                System.out.println("send response");
+                                commandArray = commandInput.split(" ");
+                                String command = commandArray[0];
+                                String c_arg = (commandArray.length > 1) ? commandArray[1] : "undefined";
+
+                                if (command.compareTo("LIST") == 0 || command.compareTo("ls") == 0) {
+                                    System.out.println("LIST command, argument :" + c_arg);
+
+                                } else if (command.compareTo("CD") == 0 || command.compareTo("cd") == 0) {
+                                    System.out.println("CD command, argument :" + c_arg);
+                                } else if (command.compareTo("GET") == 0) {
+                                    System.out.println("GET command, argument :" + c_arg);
+                                } else if (command.compareTo("PUT") == 0) {
+                                    System.out.println("PUT command, argument :" + c_arg);
+                                } else {
+                                    out.println(command + ": command not found");
+                                }
+
                             }
                         } catch (IOException e) {
                             e.printStackTrace();
-                            try { clientCommand.close(); } catch (IOException ex) { }
+                            try { c_client.close(); } catch (IOException ex) { }
                         }
                     }
                 }).start();
             }
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    void ListCommand(String arg, PrintWriter out) throws Exception {
+        if (arg.compareTo("undefined") == 0) {
+            out.println("need argument");
         }
     }
 }
